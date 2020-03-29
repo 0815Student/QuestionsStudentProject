@@ -1,6 +1,6 @@
 public class StringHandler {
 
-    private static String[] bannedNames = { "continue", "all", "standard", "&!&", "start", "Start", "Continue", "All", "Standard" };
+    private static String[] bannedNames = { "continue", "all", "standard", "&!&", "start", "Start", "Continue", "All", "Standard", "save", "Save", "load", "Load", "highscore", "Highscore'" };
 
     public static boolean checkIfQuit( String toCheck ){
         if( toCheck.equals( "q" ) || toCheck.equals( "Q" ) ){
@@ -40,6 +40,31 @@ public class StringHandler {
         } else {
             return false;
         }
+    }
+
+    public static boolean checkIfSave( String toCheck ) {
+        if( toCheck.equals( "save" ) || toCheck.equals( "Save" ) ){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean checkIfLoad( String toCheck ) {
+        if( toCheck.equals( "load" ) || toCheck.equals( "Load" ) ){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean checkIfHighscore( String toCheck ){
+        if( toCheck.equals( "highscore" ) || toCheck.equals( "Highscore" ) ){
+            return true;
+        } else {
+            return false;
+        }
+
     }
 
     public static boolean checkIfStringValid( String toCheck ){

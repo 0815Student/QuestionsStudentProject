@@ -1,7 +1,7 @@
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
-public class GameInstance {
+public class GameInstance implements Serializable {
     private int numberOfQuestions;
     private List<String> categories;
     private List<Question> questionList;
@@ -16,6 +16,10 @@ public class GameInstance {
     private int currentCorrectAnswer;
     private int currentQuestionNr;
 
+    private boolean isStandardGame;
+
+    private int correctAnswerCount;
+
     public GameInstance() {
         this.numberOfQuestions = 0;
         this.questionList = new LinkedList<Question>();
@@ -26,6 +30,8 @@ public class GameInstance {
         this.currentCorrectAnswer = 0;
         this.currentQuestionNr = 1;
         this.gameIsCurrentlyRunning = false;
+        this.isStandardGame = false;
+        this.correctAnswerCount = 0;
         try {
             this.allQuestions = DataHandler.getAllQuestions();
         } catch (IOException e) {
@@ -66,13 +72,7 @@ public class GameInstance {
         this.categories = categories;
     }
 
-    public boolean getStatus() {
-        if (this.gameIsCurrentlyRunning) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+    public boolean getStatus() { return this.gameIsCurrentlyRunning; }
 
     public void createGame(){
 
@@ -105,16 +105,39 @@ public class GameInstance {
         }
     }
 
-    public boolean nextStep( String input ) {
+    public boolean nextStep( String input, Scanner scanner ) throws IOException {
 
         if ( !this.gameIsCurrentlyRunning ) {
             this.getGameSetup( input );
             return false;
         } else {
             if( this.questionList.isEmpty() ){
+
+                return true;
+            }
+            if( StringHandler.checkIfSave( input ) ){
+                this.createSavegame();
                 return true;
             }
             boolean lastQuestion = this.nextQuestion( input );
+
+            if( lastQuestion && this.isStandardGame ){
+                System.out.println( "Congratulations! You finished a standard game and you had " + this.correctAnswerCount + " of " + this.numberOfQuestions + " questions correct. Do you want to save this in the highscore file? y/n" );
+                if( StringHandler.checkIfYesOrNo( scanner.nextLine() ) ){
+                    System.out.println( "Please enter your username:" );
+                    boolean gotUsername = false;
+                    String username = new String();
+                    while( !gotUsername ){
+                        username = scanner.nextLine();
+                        if( StringHandler.checkIfStringValid( username ) ){
+                            gotUsername = true;
+                        }
+                    }
+
+                    DataHandler.saveHighscore( username, this.correctAnswerCount );
+                }
+            }
+
             return lastQuestion;
         }
 
@@ -131,6 +154,7 @@ public class GameInstance {
             }
             if( number == this.currentCorrectAnswer ){
                 System.out.println( "Correct! Next Question :)");
+                this.correctAnswerCount++;
             } else {
                 System.out.println( "What a shame..." );
                 System.out.println( "The correct answer was: " + this.questionList.get( 0 ).getCorrectAnswer() );
@@ -140,6 +164,7 @@ public class GameInstance {
 
             if( input.toUpperCase().equals( this.questionList.get( 0 ).getCorrectAnswer().toUpperCase() ) ){
                 System.out.println( "Correct! Next Question :)");
+                this.correctAnswerCount++;
             } else {
                 System.out.println( "What a shame..." );
                 System.out.println( "The correct answer was: " + this.questionList.get( 0 ).getCorrectAnswer() );
@@ -210,7 +235,7 @@ public class GameInstance {
                 this.hasAllCategories = true;
 
                 if( input.equals( "standard" ) ){
-
+                    this.isStandardGame = true;
                     this.numberOfQuestions = 10;
                     this.hasAllCategories = true;
                     this.questionType = 3;
@@ -335,5 +360,24 @@ public class GameInstance {
                 }
             }
         }
+    }
+
+    public void printCurrentQuestion(){
+        this.printQuestion(  this.questionList.get( 0 ), this.currentQuestionNr );
+    }
+
+    public void createSavegame() throws IOException {
+        String rootPath = new String( System.getProperty( "user.dir" ) );
+        File file = new File( rootPath + "\\" + "save.sav" );
+
+        if( !file.exists() || !file.isFile() ){
+            file.createNewFile();
+            System.out.println( "Save file created." );
+        } else {
+            System.out.println( "Overwriting save file" );
+        }
+        FileOutputStream fos = new FileOutputStream( rootPath + "\\" + "save.sav" );
+        ObjectOutputStream oos = new ObjectOutputStream( fos );
+        oos.writeObject( this );
     }
 }

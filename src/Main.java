@@ -1,3 +1,4 @@
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -19,6 +20,8 @@ public class Main {
         System.out.println( "You can quit the program whenever you want by simply typing 'q' or 'Q'." );
         System.out.println( "To start a new game type 'Start' or 'start'. With this you can also start a new game while playing." );
         System.out.println( "To add new questions to the pool, type 'add'. This only works when no game is currently running." );
+        System.out.println( "You can save your game while playing by typing 'save', while no game is running you can load a saved game by typing 'load'" );
+        System.out.println( "To view highscores type 'highscore'" );
         System.out.println( "Please have fun :)" );
 
         while( true ){
@@ -54,15 +57,27 @@ public class Main {
                     DataHandler.createNewQuestion( scanner );
                 }
 
+                if( StringHandler.checkIfLoad( input ) ){
+                    game = DataHandler.loadGame();
+                    if( game != null ){
+                        game.printCurrentQuestion();
+                    }
+
+                }
+
+                if( StringHandler.checkIfHighscore( input ) ){
+                    DataHandler.printHighscore();
+                }
+
                 continue;
             }
 
-            boolean gameFinished = game.nextStep( input );
+            boolean gameFinished = game.nextStep( input, scanner );
 
             if( gameFinished ){
                 game = null;
-                System.out.println( "That was the last question.");
-                System.out.println( "Type 'start' to start a new one, 'q' to quit or 'add' to add a new question to the game");
+                System.out.println( "No game is running.");
+                System.out.println( "Type 'start' to start a new one, 'q' to quit, 'load' to load a savegame or 'add' to add a new question to the game");
             }
 
         }

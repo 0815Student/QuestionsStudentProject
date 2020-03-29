@@ -29,7 +29,7 @@ public class DataHandler {
                         String[] lineArr = line.split( "&!&" );
 
                         if( lineArr.length < 2 ) {
-                            System.out.println( "Attetion: There is an invalid question in file " + fileName + " on line " + currLine );
+                            System.out.println( "Attention: There is an invalid question in file " + fileName + " on line " + currLine );
                             continue;
                         }
 
@@ -55,7 +55,7 @@ public class DataHandler {
     public static boolean createNewQuestion( Scanner scanner ) throws IOException {
 
         //if you want to add new functionality here remember to add the keyword to the bannedNames array in the StringHandler Class and remove questions from existing files that have them as an answer or question
-        System.out.println( "Please note that while creating a new question 'q' and 'Q' always quits the program. So this cannot be a question or an answer. 'continue', 'add', 'all', 'start' and '&!&' are also forbidden as these are keywords during game setup/delimiters." );
+        System.out.println( "Please note that while creating a new question 'q' and 'Q' always quits the program. So this cannot be a question or an answer. 'continue', 'add', 'all', 'start', 'save', 'load', 'highscore' and '&!&' are also forbidden as these are keywords during game setup/delimiters." );
         System.out.println( "If you enter multiple answers you will create a multiple choice question. If you enter just 1 answer you will create a normal question.");
         System.out.println( "Please enter your question category:");
 
@@ -157,6 +157,90 @@ public class DataHandler {
         System.out.println( "To add new questions to the pool, type 'add'. This only works when no game is currently running." );
         return true;
 
+    }
+
+    public static GameInstance loadGame(){
+        String rootPath = new String( System.getProperty( "user.dir" ) );
+        File file = new File( rootPath + "\\" + "save.sav" );
+
+        if( !file.exists() || !file.isFile() ){
+            System.out.println( "No savegame found." );
+        }
+        try {
+            FileInputStream fis = new FileInputStream( rootPath + "\\" + "save.sav" );
+            ObjectInputStream ois = new ObjectInputStream( fis );
+            GameInstance game = (GameInstance) ois.readObject();
+            return game;
+        }
+        catch( Exception e ){
+            System.out.println( "Couldn't load savegame." );
+            return null;
+        }
+    }
+
+    public static void saveHighscore( String username, int score ) throws IOException {
+        String rootPath = new String( System.getProperty( "user.dir" ) );
+        File file = new File( rootPath + "\\" + "highscore.score" );
+        boolean newFile = false;
+
+        if( !file.exists() || !file.isFile() ){
+            file.createNewFile();
+            newFile = true;
+            System.out.println( "First Highscore... New File created." );
+        }
+        if( file.exists() && file.isFile() ){
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream(file, true), "UTF-8"));
+
+            if( !newFile ){
+                writer.newLine();
+            }
+            writer.write( username + "&!&" + score );
+            writer.close();
+            System.out.println( "Highscore added." );
+            System.out.println();
+        } else {
+            System.out.println( "Couldn't write highscore" );
+            System.out.println();
+        }
+    }
+
+    public static void printHighscore() throws IOException {
+        String rootPath = new String( System.getProperty( "user.dir" ) );
+        File file = new File( rootPath + "\\" + "highscore.score" );
+        List<LinkedList<String> > allScores = new ArrayList<LinkedList<String> >();
+        if( !file.exists() || !file.isFile() ){
+            System.out.println( "No highscore file found." );
+            return;
+        }
+        for( int i = 0; i<=10; i++ ){
+            allScores.add( new LinkedList<String>() );
+        }
+        BufferedReader br = new BufferedReader(new FileReader( file.getPath() ));
+        String line;
+
+        while( ( line = br.readLine() ) != null ) {
+
+            String[] lineArr = line.split( "&!&" );
+
+            if( lineArr.length != 2 ) {
+                System.out.println( "Attention: There is an invalid highscore!" );
+                continue;
+            }
+
+            String username = lineArr[0];
+            String score = lineArr[1];
+
+            int scoreInt = Integer.parseInt( score );
+            if( !allScores.get( scoreInt ).contains( username ) ){
+                allScores.get( scoreInt ).add( username );
+            }
+        }
+
+        for( int i = 0; i<=10; i++ ){
+            System.out.println( i + " points: " + String.join(", ", allScores.get( i )));
+
+        }
     }
 
 }
