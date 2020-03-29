@@ -1,6 +1,9 @@
 import java.io.Serializable;
 import java.util.List;
 
+//this class is a wrapper for easy handling of single questions,
+//this is useful for example if you wanted to add another question type it would be pretty easy to do here
+
 public class Question implements Serializable {
 
     private String category;

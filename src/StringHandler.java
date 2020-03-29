@@ -1,3 +1,5 @@
+//this class handles String Checks - it is pretty simple
+
 public class StringHandler {
 
     private static String[] bannedNames = { "continue", "all", "standard", "&!&", "start", "Start", "Continue", "All", "Standard", "save", "Save", "load", "Load", "highscore", "Highscore'" };

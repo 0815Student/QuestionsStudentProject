@@ -1,6 +1,8 @@
 import java.io.*;
 import java.util.*;
-//test
+
+//this class handles all input from files and output to files - it is pretty selfexplanatory by the method names
+
 public class DataHandler {
 
     public static HashMap<String, List<Question>> getAllQuestions() throws IOException {

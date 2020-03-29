@@ -1,4 +1,3 @@
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -51,6 +50,8 @@ public class Main {
                     }
                 }
             }
+
+            //here we are not starting a new game - if game == null the there is also no game running yet so we can check for actions that don't require a game running
             if( game == null ){
 
                 if( StringHandler.checkIfAdd( input ) ){
@@ -72,12 +73,14 @@ public class Main {
                 continue;
             }
 
+            //if we're here we didn't do actions outside of a game, nextStep returns true when either the last question of the game was answered (and a highscore added if a standard game)
             boolean gameFinished = game.nextStep( input, scanner );
 
             if( gameFinished ){
                 game = null;
                 System.out.println( "No game is running.");
                 System.out.println( "Type 'start' to start a new one, 'q' to quit, 'load' to load a savegame or 'add' to add a new question to the game");
+                System.out.println( "To view the highscores type 'highscore'" );
             }
 
         }

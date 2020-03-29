@@ -1,6 +1,10 @@
 import java.io.*;
 import java.util.*;
 
+//this is the game class, it handles the state a running game is in, the main features are
+// 1. Start a new game and set the settings for it
+// 2. ask the questions and check if the answers are correct + count correct answers
+
 public class GameInstance implements Serializable {
     private int numberOfQuestions;
     private List<String> categories;
@@ -32,6 +36,9 @@ public class GameInstance implements Serializable {
         this.gameIsCurrentlyRunning = false;
         this.isStandardGame = false;
         this.correctAnswerCount = 0;
+
+        //Questions are read from Files once a new game is started
+        //this doesn't happen on Program Start because then newly added questions wouldn't be part of the game yet
         try {
             this.allQuestions = DataHandler.getAllQuestions();
         } catch (IOException e) {
@@ -74,6 +81,7 @@ public class GameInstance implements Serializable {
 
     public boolean getStatus() { return this.gameIsCurrentlyRunning; }
 
+    //this method creates the list of questions for the game when all parameters have been set
     public void createGame(){
 
         int currentNumberOfQuestions = 0;
@@ -105,6 +113,7 @@ public class GameInstance implements Serializable {
         }
     }
 
+    //this is the main method while playing a game. It branches off into 'getGameSetup' and 'nextQuestion' for the main part
     public boolean nextStep( String input, Scanner scanner ) throws IOException {
 
         if ( !this.gameIsCurrentlyRunning ) {
@@ -143,6 +152,7 @@ public class GameInstance implements Serializable {
 
     }
 
+    //this method checks if the last answer was correct, then asks the next question
     public boolean nextQuestion( String input ){
         if( this.questionList.get( 0 ).getType() == 1 ){
             int number = 0;
@@ -183,6 +193,13 @@ public class GameInstance implements Serializable {
 
     }
 
+    //this method prepares the game it is split into the 'category'-, the 'number of questions' and the 'questiontype' part
+    //question types are
+    // 1 -> multiple choice
+    // 2 -> free entry
+    // 3 -> any question
+    //this method is so long and rather complicated because there is a lot to check
+    // for example questions have to be counted and sorted into different groups so that the user cannot ask more questions of a certain type and category
     public boolean getGameSetup(String input) {
 
         //add question categories
